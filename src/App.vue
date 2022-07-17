@@ -84,7 +84,6 @@ export default {
       minutes.value = "01";
       seconds.value = "00";
       timer.value = 0;
-      // clearInterval(timeInterval);
       setTimeout(() => shuffle(images), 1000);
     }
 
@@ -92,7 +91,6 @@ export default {
       const timeInterval = setInterval(() => {
         if ((seconds.value == 0 && minutes.value == 0) || done.value == true) {
           clearInterval(timeInterval);
-          // done.value = true;
         } else {
           if (timer.value % 60 == 0) {
             if (seconds.value == 0) minutes.value--;
