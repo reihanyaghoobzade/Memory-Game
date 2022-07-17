@@ -1,0 +1,42 @@
+<template>
+  <div
+    class="memory-card relative cursor-pointer"
+    :class="{ 'flipped': props.active }"
+    @click="clickHandler(this.image)"
+  >
+    <img :src="props.image.img" alt="" class="rounded-md front absolute" />
+    <div
+      class="back rounded-md flex items-center justify-center w-full h-auto md:p-12 bg-cyan-800 font-seemibold text-3xl text-white"
+    >{{ index+1 }}</div>
+  </div>
+</template>
+
+<script setup>
+const props = defineProps(["image", "index", "active"]);
+const emit = defineEmits(["onClick"]);
+
+function clickHandler(image) {
+  if (!props.active) {
+    emit("onClick", image);
+  }
+}
+</script>
+
+<style scoped>
+.front {
+  transform: rotateY(90deg);
+  transition: all ease-in 0.2s;
+}
+.flipped .front {
+  transform: rotateY(0deg);
+  transition-delay: 0.2s;
+}
+.back {
+  transition: all ease-in 0.2s;
+  transition-delay: 0.2s;
+}
+.flipped .back {
+  transform: rotateY(90deg);
+  transition-delay: 0s;
+}
+</style>
