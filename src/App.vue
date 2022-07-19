@@ -21,22 +21,21 @@ export default {
     const secondChoice = ref();
     const done = ref(false);
     const counter = ref(40);
-    const minutes = ref("01");
+    const minutes = ref("02");
     const seconds = ref("00");
     const timer = ref(minutes.value * 60 + seconds.value);
 
     onMounted(() => {
-      images.value = [...images, ...images].map((image, index) => ({
+      images.value = [...images, ...images].map(image => ({
         ...image,
         matched: false,
-        id: index,
       }));
 
-      shuffle(images);
+      shuffle(images.value);
     });
 
     function shuffle(img) {
-      img.value.sort(() => Math.random() - 0.5);
+      img.sort(() => Math.random() - 0.5);
     }
 
     function clickHandler(image) {
@@ -67,7 +66,7 @@ export default {
       setTimeout(() => {
         firstChoice.value = null;
         secondChoice.value = null;
-      }, 700);
+      }, 1000);
     }
 
     function checkCompeleted() {
@@ -91,6 +90,7 @@ export default {
       const timeInterval = setInterval(() => {
         if ((seconds.value == 0 && minutes.value == 0) || done.value == true) {
           clearInterval(timeInterval);
+          done.value = true;
         } else {
           if (timer.value % 60 == 0) {
             if (seconds.value == 0) minutes.value--;
@@ -125,8 +125,8 @@ export default {
       class="flex justify-between items-center text-4xl font-semibold w-3/5 mx-auto mb-16"
     >
       <div class="pointer-events-none">
-        <span id="minutes">{{ minutes }}</span
-        >:<span id="seconds">{{ seconds }}</span>
+        <span>{{ minutes }}</span
+        >:<span>{{ seconds }}</span>
       </div>
       <div>{{ counter }}</div>
     </div>
@@ -136,7 +136,7 @@ export default {
     >
       <Card
         v-for="(image, index) in images.value"
-        :key="image.id"
+        :key="index"
         :image="image"
         :index="index"
         :active="
@@ -148,9 +148,10 @@ export default {
       />
       <div class="col-span-4 flex justify-center items-center mt-10">
         <button
+          :class="{'opacity-100': done, 'pointer-events-auto': done}"
           @click="$router.go()"
-          type="submit"
-          class="col-span-2 py-4 px-10 bg-cyan-700 rounded-xl text-white text-xl font-semibold"
+          type="button"
+          class="col-span-2 py-4 px-10 bg-cyan-700 rounded-xl text-white text-xl font-semibold opacity-0 transition-all pointer-events-none"
         >
           شروع مجدد
         </button>
