@@ -15,7 +15,7 @@
       <div class="flex flex-col justify-center items-center">
         <div
           class="grid grid-cols-4 gap-8 justify-center items-center w-full md:w-fit"
-          @click.once="countdownTimer"
+          @click="checkClickOnce"
         >
           <Card
             v-for="(image, index) in images.value"
@@ -76,6 +76,7 @@ const info = reactive({
   firstChoice: null,
   secondChoice: null,
   showModal: true,
+  activeTimer: true
 });
 
 onMounted(() => {
@@ -108,7 +109,7 @@ function clickHandler(image) {
   info.counter--;
   if (info.counter == 0) {
     info.done = true;
-    clearInterval(timeInterval);
+    clearInterval(timeInterval.value);
   }
   checkCompeleted();
 }
@@ -117,7 +118,7 @@ function resetActive() {
   setTimeout(() => {
     info.firstChoice = null;
     info.secondChoice = null;
-  }, 1000);
+  }, 700);
 }
 
 function checkCompeleted() {
@@ -134,18 +135,28 @@ function resetGame() {
   info.minutes = null;
   info.seconds = null;
   info.showModal = true;
+  clearInterval(timeInterval.value);
   shuffle(images.value);
   images.value.map((image) => {
     image.matched = true;
   });
 }
 
+const timeInterval = ref();
+
+function checkClickOnce(){
+  if(info.activeTimer){
+    countdownTimer();
+    info.activeTimer = false;
+  }
+}
+
 function countdownTimer() {
   const timer = ref(info.minutes * 60 + info.seconds);
 
-  const timeInterval = setInterval(() => {
-    if (timer.value <= 0 || info.done == true) {
-      clearInterval(timeInterval);
+  timeInterval.value = setInterval(() => {
+    if ((info.minutes ==0 && info.seconds ==0) || info.done == true) {
+      clearInterval(timeInterval.value);
       info.done = true;
     } else {
       if (timer.value % 60 == 0) {
@@ -163,9 +174,10 @@ function setConfiguration(configInfo) {
   info.counter = configInfo.counter;
   info.minutes = configInfo.minutes;
   info.seconds = configInfo.seconds;
+  info.activeTimer = true;
   setTimeout(() => {
     images.value.forEach((image) => (image.matched = false));
-  }, 2000);
+  }, 1500);
 }
 </script>
 
