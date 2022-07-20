@@ -1,163 +1,170 @@
-<script>
-import { ref, reactive, onMounted } from "vue";
-import Card from "./components/Card.vue";
-export default {
-  components: {
-    Card: Card,
-  },
-  setup() {
-    const images = reactive([
-      { img: "./src/assets/images/product-1.jpg" },
-      { img: "./src/assets/images/product-2.jpg" },
-      { img: "./src/assets/images/product-3.jpg" },
-      { img: "./src/assets/images/product-4.jpg" },
-      { img: "./src/assets/images/product-5.jpg" },
-      { img: "./src/assets/images/product-6.jpg" },
-      { img: "./src/assets/images/product-7.jpg" },
-      { img: "./src/assets/images/product-8.jpg" },
-    ]);
-
-    const firstChoice = ref();
-    const secondChoice = ref();
-    const done = ref(false);
-    const counter = ref(40);
-    const minutes = ref("02");
-    const seconds = ref("00");
-    const timer = ref(minutes.value * 60 + seconds.value);
-
-    onMounted(() => {
-      images.value = [...images, ...images].map(image => ({
-        ...image,
-        matched: false,
-      }));
-
-      shuffle(images.value);
-    });
-
-    function shuffle(img) {
-      img.sort(() => Math.random() - 0.5);
-    }
-
-    function clickHandler(image) {
-      firstChoice.value
-        ? (secondChoice.value = image)
-        : (firstChoice.value = image);
-
-      if (firstChoice.value && secondChoice.value) {
-        if (firstChoice.value.img === secondChoice.value.img) {
-          const index1 = images.value.indexOf(image);
-          const index2 = images.value.indexOf(firstChoice.value);
-          images.value[index1].matched = true;
-          images.value[index2].matched = true;
-          resetActive();
-        } else {
-          resetActive();
-        }
-      }
-      counter.value--;
-      if (counter.value == 0) {
-        done.value = true;
-        clearInterval(timeInterval);
-      }
-      checkCompeleted();
-    }
-
-    function resetActive() {
-      setTimeout(() => {
-        firstChoice.value = null;
-        secondChoice.value = null;
-      }, 1000);
-    }
-
-    function checkCompeleted() {
-      if (images.value.every((image) => image.matched) || counter.value == 0) {
-        done.value = true;
-      }
-    }
-
-    function resetGame() {
-      firstChoice.value = ref();
-      secondChoice.value = ref();
-      counter.value = 40;
-      done.value = false;
-      minutes.value = "01";
-      seconds.value = "00";
-      timer.value = 0;
-      setTimeout(() => shuffle(images), 1000);
-    }
-
-    function countdownTimer() {
-      const timeInterval = setInterval(() => {
-        if ((seconds.value == 0 && minutes.value == 0) || done.value == true) {
-          clearInterval(timeInterval);
-          done.value = true;
-        } else {
-          if (timer.value % 60 == 0) {
-            if (seconds.value == 0) minutes.value--;
-            seconds.value = 0;
-          }
-          timer.value--;
-          seconds.value = Math.floor(timer.value % 60, 10);
-        }
-        seconds.value = ("0" + seconds.value).slice(-2);
-        minutes.value = ("0" + minutes.value).slice(-2);
-      }, 1000);
-    }
-    return {
-      images,
-      counter,
-      minutes,
-      seconds,
-      done,
-      clickHandler,
-      resetGame,
-      firstChoice,
-      secondChoice,
-      countdownTimer,
-    };
-  },
-};
-</script>
-
 <template>
   <section class="container mx-auto">
-    <div
-      class="flex justify-between items-center text-4xl font-semibold w-3/5 mx-auto mb-16"
-    >
-      <div class="pointer-events-none">
-        <span>{{ minutes }}</span
-        >:<span>{{ seconds }}</span>
+    <div class="px-4 lg:px-0 relative">
+      <div class="flex justify-center items center">
+        <Modal @configInfo="setConfiguration" v-show="info.showModal" />
       </div>
-      <div>{{ counter }}</div>
-    </div>
-    <div
-      class="grid grid-cols-4 gap-4 justify-center items-center w-2/5 mx-auto"
-      @click.once="countdownTimer"
-    >
-      <Card
-        v-for="(image, index) in images.value"
-        :key="index"
-        :image="image"
-        :index="index"
-        :active="
-          image.matched || firstChoice === image || secondChoice === image
-        "
-        :class="{ 'pointer-events-none': done }"
-        class="col-span-1 flex"
-        @onClick="clickHandler"
-      />
-      <div class="col-span-4 flex justify-center items-center mt-10">
-        <button
-          :class="{'opacity-100': done, 'pointer-events-auto': done}"
-          @click="$router.go()"
-          type="button"
-          class="col-span-2 py-4 px-10 bg-cyan-700 rounded-xl text-white text-xl font-semibold opacity-0 transition-all pointer-events-none"
+      <div
+        class="flex justify-between items-center text-2xl md:text-3xl lg:text-4xl font-semibold lg:w-3/5 mx-auto mb-16"
+      >
+        <div class="pointer-events-none">
+          <span>{{ info.minutes }}</span
+          >:<span>{{ info.seconds }}</span>
+        </div>
+        <div>{{ info.counter }}</div>
+      </div>
+      <div class="flex flex-col justify-center items-center">
+        <div
+          class="grid grid-cols-4 gap-8 justify-center items-center w-full md:w-fit"
+          @click.once="countdownTimer"
         >
-          شروع مجدد
-        </button>
+          <Card
+            v-for="(image, index) in images.value"
+            :key="index"
+            :image="image"
+            :index="index"
+            :active="
+              !!image.matched ||
+              info.firstChoice === image ||
+              info.secondChoice === image
+            "
+            :class="{ 'pointer-events-none': info.done }"
+            class="col-span-1 flex"
+            @onClick="clickHandler"
+          />
+        </div>
+
+        <div class="flex justify-center items-center mt-10">
+          <button
+            type="button"
+            @click="resetGame"
+            class="col-span-2 py-2 md:py-4 px-6 md:px-10 bg-cyan-700 rounded-xl text-white md:text-xl md:font-semibold"
+          >
+            شروع مجدد
+          </button>
+        </div>
       </div>
     </div>
   </section>
 </template>
+
+<script setup>
+import { ref, reactive, onMounted, computed } from "vue";
+import Card from "./components/Card.vue";
+import Modal from "./components/Modal.vue";
+const images = reactive([
+  { img: "./src/assets/images/product-1.jpg" },
+  { img: "./src/assets/images/product-2.jpg" },
+  { img: "./src/assets/images/product-3.jpg" },
+  { img: "./src/assets/images/product-4.jpg" },
+  { img: "./src/assets/images/product-5.jpg" },
+  { img: "./src/assets/images/product-6.jpg" },
+  { img: "./src/assets/images/product-7.jpg" },
+  { img: "./src/assets/images/product-8.jpg" },
+]);
+
+const info = reactive({
+  counter: null,
+  minutes: null,
+  seconds: null,
+  done: false,
+  firstChoice: null,
+  secondChoice: null,
+  showModal: true,
+});
+
+onMounted(() => {
+  images.value = [...images, ...images].map((image) => ({
+    ...image,
+    matched: true,
+  }));
+
+  shuffle(images.value);
+});
+
+function shuffle(img) {
+  img.sort(() => Math.random() - 0.5);
+}
+
+function clickHandler(image) {
+  info.firstChoice ? (info.secondChoice = image) : (info.firstChoice = image);
+
+  if (info.firstChoice && info.secondChoice) {
+    if (info.firstChoice.img === info.secondChoice.img) {
+      const index1 = images.value.indexOf(image);
+      const index2 = images.value.indexOf(info.firstChoice);
+      images.value[index1].matched = true;
+      images.value[index2].matched = true;
+      resetActive();
+    } else {
+      resetActive();
+    }
+  }
+  info.counter--;
+  if (info.counter == 0) {
+    info.done = true;
+    clearInterval(timeInterval);
+  }
+  checkCompeleted();
+}
+
+function resetActive() {
+  setTimeout(() => {
+    info.firstChoice = null;
+    info.secondChoice = null;
+  }, 1000);
+}
+
+function checkCompeleted() {
+  if (images.value.every((image) => image.matched) || info.counter == 0) {
+    info.done = true;
+  }
+}
+
+function resetGame() {
+  info.firstChoice = null;
+  info.secondChoice = null;
+  info.done = false;
+  info.counter = null;
+  info.minutes = null;
+  info.seconds = null;
+  info.showModal = true;
+  // clearInterval(timeInterval);
+  shuffle(images.value);
+  images.value.map((image) => {
+    image.matched = true;
+  });
+}
+
+function countdownTimer() {
+  const timer = ref(info.minutes * 60 + info.seconds);
+
+  const timeInterval = setInterval(() => {
+    if (timer.value <= 0 || info.done == true) {
+      clearInterval(timeInterval);
+      info.done = true;
+    } else {
+      if (timer.value % 60 == 0) {
+        if (info.seconds == 0) info.minutes--;
+        info.seconds = 0;
+      }
+      timer.value--;
+      info.seconds = Math.floor(timer.value % 60, 10);
+    }
+    info.minutes = ("0" + info.minutes).slice(-2);
+    info.seconds = ("0" + info.seconds).slice(-2);
+  }, 1000);
+}
+
+function setConfiguration(configInfo) {
+  info.showModal = false;
+  info.counter = configInfo.counter;
+  info.minutes = configInfo.minutes;
+  info.seconds = configInfo.seconds;
+  setTimeout(() => {
+    images.value.forEach((image) => (image.matched = false));
+  }, 2000);
+}
+</script>
 
 <style></style>
