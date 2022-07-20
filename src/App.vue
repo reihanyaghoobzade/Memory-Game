@@ -8,8 +8,7 @@
         class="flex justify-between items-center text-2xl md:text-3xl lg:text-4xl font-semibold lg:w-3/5 mx-auto mb-16"
       >
         <div class="pointer-events-none">
-          <span>{{ info.minutes }}</span
-          >:<span>{{ info.seconds }}</span>
+          {{ timer }}
         </div>
         <div>{{ info.counter }}</div>
       </div>
@@ -62,6 +61,12 @@ const images = reactive([
   { img: "./src/assets/images/product-7.jpg" },
   { img: "./src/assets/images/product-8.jpg" },
 ]);
+
+const timer = computed(() => {
+  info.minutes = info.minutes < 10 ? ("0" + info.minutes).slice(-2) : info.minutes;
+  info.seconds = info.seconds < 10 ? ("0" + info.seconds).slice(-2) : info.seconds;
+  return `${info.minutes}:${info.seconds}`;
+});
 
 const info = reactive({
   counter: null,
@@ -129,7 +134,6 @@ function resetGame() {
   info.minutes = null;
   info.seconds = null;
   info.showModal = true;
-  // clearInterval(timeInterval);
   shuffle(images.value);
   images.value.map((image) => {
     image.matched = true;
@@ -151,8 +155,6 @@ function countdownTimer() {
       timer.value--;
       info.seconds = Math.floor(timer.value % 60, 10);
     }
-    info.minutes = ("0" + info.minutes).slice(-2);
-    info.seconds = ("0" + info.seconds).slice(-2);
   }, 1000);
 }
 

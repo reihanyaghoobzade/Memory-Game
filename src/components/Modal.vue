@@ -18,7 +18,7 @@
               >
                 تعداد حرکات باید بین 20 و 60 باشد
               </div>
-              <div class="flex flex-col lg:flex-row gap-4">
+              <div class="flex flex-col lg:flex-row gap-4 order-2">
                 <input
                   class="bg-stone-400 border-b-2 border-stone-700 outline-0 text-lg font-semibold order-2"
                   type="text"
@@ -41,7 +41,7 @@
               >
                 تعداد دقایق باید بین 1 و 3 باشد
               </div>
-              <div class="flex flex-col lg:flex-row gap-4">
+              <div class="flex flex-col lg:flex-row gap-4 order-2">
                 <input
                   class="bg-stone-400 border-b-2 border-stone-700 outline-0 text-lg font-semibold order-2"
                   type="text"
@@ -62,7 +62,7 @@
                 تعداد ثانیه‌ها باید بین 0 و 59 باشد
               </div>
 
-              <div class="flex flex-col lg:flex-row gap-4">
+              <div class="flex flex-col lg:flex-row gap-4 order-2">
                 <input
                   class="bg-stone-400 border-b-2 border-stone-700 outline-0 text-lg font-semibold order-2"
                   type="text"
