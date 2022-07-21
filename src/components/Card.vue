@@ -23,6 +23,7 @@ const emit = defineEmits(["onClick"]);
 
 function clickHandler(image) {
   if (!props.active) {
+    // console.log(props.active)
     emit("onClick", image);
   }
 }
