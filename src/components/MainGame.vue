@@ -73,7 +73,7 @@ const timer = computed(() => {
   return `${info.minutes}:${info.seconds}`;
 });
 
-const info = reactive({ ...computed(() => store.getters.getInfo).value });
+const info = reactive({ ...store.state.info });
 
 function sendData(key, value) {
   store.commit("changeInfo", { key, value });
