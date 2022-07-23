@@ -73,7 +73,7 @@ const timer = computed(() => {
   return `${info.minutes}:${info.seconds}`;
 });
 
-const info = reactive({ ...computed(() => store.getters.getInfo).value });
+const info = reactive({ ...store.state.info });
 
 function sendData(key, value) {
   store.commit("changeInfo", { key, value });
@@ -135,18 +135,22 @@ function checkCompeleted() {
   }
 }
 
-function resetGame(showModal) {
-
-  info.firstChoice = null;
-  info.secondChoice = null;
-  info.done = false;
-  info.counter = 40;
-  info.minutes = 2;
-  info.seconds = 0;
-  info.activeTimer = true;
-  info.config = showModal;
+function resetGame() {
+  info.config = false;
+  sendData("config", info.config);
 
   clearInterval(timeInterval.value);
+
+  const resetInfo = reactive({ ...store.state.info });
+
+  info.firstChoice = resetInfo.firstChoice;
+  info.secondChoice = resetInfo.secondChoice;
+  info.done = resetInfo.done;
+  info.counter = resetInfo.counter;
+  info.minutes = resetInfo.minutes;
+  info.seconds = resetInfo.seconds;
+  info.activeTimer = resetInfo.activeTimer;
+  info.config = resetInfo.config;
 
   shuffle(images.value);
 

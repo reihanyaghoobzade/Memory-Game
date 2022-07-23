@@ -103,17 +103,17 @@ import { useRouter } from "vue-router";
 import { computed, reactive } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
-const info = reactive({...(computed(() => store.getters.getInfo).value)});
+const info = reactive({ ...store.state.info });
 const error = reactive({ counter: false, minutes: false, seconds: false });
 const router = useRouter();
 
-function sendData(key, value){
-  store.commit("changeInfo", {key, value});
+function sendData(key, value) {
+  store.commit("changeInfo", { key, value });
 }
 
 function clickHandler() {
   error.counter = false;
-  error.minutes = false;  
+  error.minutes = false;
   error.seconds = false;
   if (
     info.counter >= 20 &&
@@ -125,11 +125,11 @@ function clickHandler() {
   ) {
     info.minutes = ("0" + info.minutes).slice(-2);
     info.seconds = ("0" + info.seconds).slice(-2);
-    sendData('counter', info.counter);
-    sendData('minutes', info.minutes);
-    sendData('seconds', info.seconds);
-  info.config = false;
-    sendData('config', info.config);
+    sendData("counter", info.counter);
+    sendData("minutes", info.minutes);
+    sendData("seconds", info.seconds);
+    info.config = false;
+    sendData("config", info.config);
     router.replace({ path: "/game" });
   } else {
     if (!(info.counter >= 20 && info.counter <= 60)) error.counter = true;

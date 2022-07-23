@@ -4,9 +4,9 @@
   >
     <div class="container mx-auto">
       <div class="w-3/5 mx-auto py-8 px-6 rounded-lg bg-stone-400">
-        <div class="flex flex-col justify-end items-center gap-8">
-          <p class="text-lg font-semibold">
-            تنظیمات را انجام نداده‌اید، با تنظیمات پیش‌فرض ادامه می‌دهید؟
+        <div class="flex flex-col justify-center items-end gap-8">
+          <p class="text-lg font-semibold text-end">
+            تنظیمات را انجام نداده‌اید، با تنظیمات پیش‌فرض یا قبل ادامه می‌دهید؟
           </p>
           <div class="flex justify-end items-center gap-8 w-full">
             <button
@@ -34,7 +34,7 @@ const router = useRouter();
 const emit = defineEmits();
 
 function clickHandler() {
-  emit("continue", false);
+  emit("continue");
 }
 </script>
 
